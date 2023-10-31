@@ -1,0 +1,133 @@
+public class BinarySearchTree<E> {
+
+    private Node root;
+    public class Node{
+        int height;
+        int val;
+        Node left;
+        Node right;
+
+        public Node(int val) {
+            this.val = val;
+        }
+
+        public Node(Node left) {
+            this.left = left;
+        }
+
+        public Node(Node left,Node right) {
+            this.left = left;
+            this.right = right;
+        }
+
+    }
+
+    public boolean insert(int val){
+        root = insert(val,root);
+        return true;
+    }
+
+    public int getHeight(Node node){
+        return node==null ? -1 : node.height;
+    }
+
+    private Node insert(int val, Node node){
+        if(node==null){
+            node = new Node(val);
+            return node;
+        }
+
+        if(val <= node.val){
+            node.left = insert(val,node.left);
+        }
+
+        if(val>node.val){
+            node.right = insert(val,node.right);
+        }
+
+        node.height = Math.max(getHeight(node.left), getHeight(node.right))+1;
+
+      return balance(node);
+    }
+
+    // AVL Balance
+    private Node balance(Node node) {
+        //case 1(left-left) or case 2(left-right)
+        if(getHeight(node.left)-getHeight(node.right) > 1){
+            if(getHeight(node.left.left)-getHeight(node.left.right) > 0){
+                //case 1 : left-left
+                node = rotateRight(node);
+            }
+
+            if(getHeight(node.left.left)-getHeight(node.left.right) < 0){
+                //case 2 : left-right
+                node.left = rotateLeft(node.left);
+                node = rotateRight(node);
+            }
+        }
+        //case 3(right-right) or case 4(left-right)
+        if(getHeight(node.left)-getHeight(node.right) < -1){
+            if(getHeight(node.right.right)-getHeight(node.right.left) > 0 ){
+                //case 3: right-right
+                node = rotateLeft(node);
+            }
+
+            if(getHeight(node.right.right)-getHeight(node.right.left) < 0){
+                //case 4: right-left
+                node.right = rotateRight(node.right);
+                node = rotateLeft(node);
+            }
+        }
+        return node;
+    }
+
+    private Node rotateLeft(Node p) {
+        Node c = p.right;
+        Node t = c.left;
+
+        c.left = p;
+        p.right = t;
+
+        p.height = Math.max(getHeight(p.left),getHeight(p.right))+1;
+        c.height = Math.max(getHeight(c.left),getHeight(c.right))+1;
+
+        return c;
+    }
+
+    private Node rotateRight(Node p) {
+        Node c = p.left;
+        Node t = p.left.right;
+
+        c.right = p;
+        p.left = t;
+
+        p.height = Math.max(getHeight(p.left),getHeight(p.right))+1;
+        c.height = Math.max(getHeight(c.left),getHeight(c.right))+1;
+
+        return c;
+    }
+
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        getTreeString(root, 0, result);
+        return result.toString();
+    }
+
+    private void getTreeString(Node root, int level, StringBuilder result) {
+        if (root != null) {
+            getTreeString(root.right, level + 1, result);
+
+            for (int i = 0; i < level; i++) {
+                result.append("    ");
+            }
+            if(root==this.root){
+                result.append(root.val).append("\n");
+            }else {
+                result.append("|---->").append(root.val).append("\n");
+            }
+
+            getTreeString(root.left, level + 1, result);
+        }
+    }
+
+}
