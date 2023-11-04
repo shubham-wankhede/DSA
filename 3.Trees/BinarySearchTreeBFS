@@ -1,0 +1,220 @@
+public class BinarySearchTree<E> {
+
+    private Node root;
+    public class Node{
+        int height;
+        int val;
+        Node left;
+        Node right;
+
+        public Node(int val) {
+            this.val = val;
+        }
+
+        public Node(Node left) {
+            this.left = left;
+        }
+
+        public Node(Node left,Node right) {
+            this.left = left;
+            this.right = right;
+        }
+
+    }
+
+    public boolean insert(int val){
+        root = insert(val,root);
+        return true;
+    }
+
+    public int getHeight(Node node){
+        return node==null ? -1 : node.height;
+    }
+
+    private Node insert(int val, Node node){
+        if(node==null){
+            node = new Node(val);
+            return node;
+        }
+
+        if(val <= node.val){
+            node.left = insert(val,node.left);
+        }
+
+        if(val>node.val){
+            node.right = insert(val,node.right);
+        }
+
+        node.height = Math.max(getHeight(node.left), getHeight(node.right))+1;
+
+      return balance(node);
+    }
+
+    // AVL Balance
+    private Node balance(Node node) {
+        //case 1(left-left) or case 2(left-right)
+        if(getHeight(node.left)-getHeight(node.right) > 1){
+            if(getHeight(node.left.left)-getHeight(node.left.right) > 0){
+                //case 1 : left-left
+                node = rotateRight(node);
+            }
+
+            if(getHeight(node.left.left)-getHeight(node.left.right) < 0){
+                //case 2 : left-right
+                node.left = rotateLeft(node.left);
+                node = rotateRight(node);
+            }
+        }
+        //case 3(right-right) or case 4(left-right)
+        if(getHeight(node.left)-getHeight(node.right) < -1){
+            if(getHeight(node.right.right)-getHeight(node.right.left) > 0 ){
+                //case 3: right-right
+                node = rotateLeft(node);
+            }
+
+            if(getHeight(node.right.right)-getHeight(node.right.left) < 0){
+                //case 4: right-left
+                node.right = rotateRight(node.right);
+                node = rotateLeft(node);
+            }
+        }
+        return node;
+    }
+
+    private Node rotateLeft(Node p) {
+        Node c = p.right;
+        Node t = c.left;
+
+        c.left = p;
+        p.right = t;
+
+        p.height = Math.max(getHeight(p.left),getHeight(p.right))+1;
+        c.height = Math.max(getHeight(c.left),getHeight(c.right))+1;
+
+        return c;
+    }
+
+    private Node rotateRight(Node p) {
+        Node c = p.left;
+        Node t = p.left.right;
+
+        c.right = p;
+        p.left = t;
+
+        p.height = Math.max(getHeight(p.left),getHeight(p.right))+1;
+        c.height = Math.max(getHeight(c.left),getHeight(c.right))+1;
+
+        return c;
+    }
+
+    public boolean isBalanced(){
+        return isBalanced(root);
+    }
+
+    public boolean isBalanced(Node node){
+        if(node==null)
+            return true;
+        return Math.abs(getHeight(node.left)-getHeight(node.right)) <= 1 && isBalanced(node.left) && isBalanced(node.right);
+    }
+
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        getTreeString(root, 0, result);
+        return result.toString();
+    }
+
+    private void getTreeString(Node root, int level, StringBuilder result) {
+        if (root != null) {
+            getTreeString(root.right, level + 1, result);
+
+            for (int i = 0; i < level; i++) {
+                result.append("    ");
+            }
+            if(root==this.root){
+                result.append(root.val).append("\n");
+            }else {
+                result.append("|---->").append(root.val).append("\n");
+            }
+
+            getTreeString(root.left, level + 1, result);
+        }
+    }
+
+    //Pre-Order Traversal
+    public String getPreorder(){
+        StringBuilder result = new StringBuilder();
+        result.append("[");
+        getPreOrder(root, result);
+        result.deleteCharAt(result.length()-1);
+        result.append("]");
+        return result.toString();
+    }
+	
+    private void getPreOrder(Node node, StringBuilder result) {
+        if(node != null){
+            result.append(node.val+",");
+            this.getInOrder(node.left,result);
+            this.getInOrder(node.right,result);
+        }
+    }
+
+    //In-Order Traversal
+    public String getInorder(){
+        StringBuilder result = new StringBuilder();
+        result.append("[");
+        getInOrder(root, result);
+        result.deleteCharAt(result.length()-1);
+        result.append("]");
+        return result.toString();
+    }
+
+    private void getInOrder(Node node, StringBuilder result) {
+        if(node != null){
+            this.getInOrder(node.left,result);
+            result.append(node.val+",");
+            this.getInOrder(node.right,result);
+        }
+    }
+
+    //Post-order traversal
+    public String getPostOrder(){
+        StringBuilder result = new StringBuilder();
+        result.append("[");
+        getPostOrder(root, result);
+        result.deleteCharAt(result.length()-1);
+        result.append("]");
+        return result.toString();
+    }
+
+    private void getPostOrder(Node node, StringBuilder result) {
+        if(node != null){
+            this.getInOrder(node.left,result);
+            this.getInOrder(node.right,result);
+            result.append(node.val+",");
+        }
+    }
+
+   // BFS (Breadth First Search Traversal)
+    public String printBFS(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(root);
+        bfs(queue,sb);
+        sb.deleteCharAt(sb.length()-1);
+        sb.append("]");
+        return sb.toString();
+    }
+
+    public void bfs(Queue<Node> queue,StringBuilder sb){
+        if(!queue.isEmpty()){
+            Node node = queue.remove();
+            sb.append(node.val).append(",");
+
+            if(node.left != null) queue.offer(node.left);
+            if(node.right != null) queue.offer(node.right);
+
+            bfs(queue,sb);
+        }
+    }
+}
