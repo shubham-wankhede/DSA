@@ -1,0 +1,88 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    //recursive solution time : 0(log n) space:0(1)
+    public int maxDepth(TreeNode root) {
+        return height(root);
+    }
+
+    public int height(TreeNode node){
+        if(node == null)
+            return 0;
+
+        int l = height(node.left);
+        int r = height(node.right);
+
+        int h = Math.max(l,r)+1;
+
+        return h;
+    }
+
+    //Iterative solution
+    // time : 0 (n) , space 0(n)
+    public int maxDepth(TreeNode root) {
+        if(root==null)
+            return 0;
+
+        Stack<TreeNode> stack = new Stack<>();
+        Stack<Integer> levelValue = new Stack<>();
+
+        stack.push(root);
+        levelValue.push(1);
+
+        int maxLevel = 0;
+
+        while(!stack.empty()){
+            TreeNode node = stack.pop();
+
+            int temp = levelValue.pop();
+            maxLevel = Math.max(maxLevel,temp);
+
+            if(node.left!=null){
+                stack.push(node.left);
+                levelValue.push(temp+1);
+            }
+
+            if(node.right!=null){
+                stack.push(node.right);
+                levelValue.push(temp+1);
+            }
+        }
+
+        return maxLevel;
+    }
+
+     public int maxDepth(TreeNode root) {
+        if(root==null) return 0;
+        int depth=0;
+        Queue<TreeNode> queue=new LinkedList<TreeNode>();
+        queue.offer(root);
+        while(!queue.isEmpty()){
+            int levelSize=queue.size();
+            depth++;
+            for(int i=0;i<levelSize;i++){
+                TreeNode top=queue.poll();
+                if(top.left!=null) queue.offer(top.left);
+                if(top.right!=null) queue.offer(top.right);
+            }
+        }
+        return depth;
+    }
+
+
+
+    
+}
