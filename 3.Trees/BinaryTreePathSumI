@@ -44,11 +44,42 @@ The number of nodes in the tree is in the range [0, 5000].
 -1000 <= targetSum <= 1000
   */
 class Solution {
+    //using recursion
     public boolean hasPathSum(TreeNode root, int targetSum) {
        if(root == null) return false;
        if(root.left == null && root.right == null && targetSum-root.val == 0) return true;
 
        return hasPathSum(root.left, targetSum-root.val) || hasPathSum(root.right,targetSum-root.val);
+    }
+
+    //using iterative approach
+    public boolean hasPathSum(TreeNode root, int targetSum) {
+        if(root==null)
+            return false;
+
+        Stack<TreeNode> stack = new Stack<>();
+        Stack<Integer> sum = new Stack<>();
+
+        stack.push(root);
+        sum.push(root.val);
+        
+        while(!stack.isEmpty()){
+            TreeNode node = stack.pop();
+            int tempSum = sum.pop();
+            if(tempSum == targetSum && node.left == null && node.right == null)
+                return true;
+
+            if(node.right != null){
+                stack.push(node.right);
+                sum.push(tempSum+node.right.val);
+            }
+
+            if(node.left != null){
+                stack.push(node.left);
+                sum.push(tempSum+node.left.val);
+            }
+        }
+        return false;
     }
 
    
